@@ -15,6 +15,7 @@ const authRouter = require('./routes/authRoutes.js')
 const userRouter = require('./routes/usersRoutes.js')
 const productRouter = require('./routes/productRoutes')
 const reviewsRouter = require('./routes/reviewRoutes.js')
+const orderRouter = require('./routes/orderRoutes.js')
 
 app.use(morgan('tiny')) // it used console the request method and the path and the response status
 app.use(express.json()) //to get data from page
@@ -34,6 +35,7 @@ app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/users', userRouter)
 app.use('/api/v1/products', productRouter)
 app.use('/api/v1/reviews', reviewsRouter)
+app.use('/api/v1/orders', orderRouter)
 app.use(notFoundMiddleware)
 app.use(errorHandlerMiddleware)
 const Port = process.env.Port || 4000
