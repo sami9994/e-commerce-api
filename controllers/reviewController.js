@@ -26,12 +26,11 @@ const createReview = async (req, res) => {
   res.status(StatusCodes.CREATED).json({ review })
 }
 const getAllReviews = async (req, res) => {
-  const reviews = await Review.find({})
-    .populate({
-      path: 'product',
-      select: 'name price company',
-    })
-    .populate({ path: 'user', select: 'name' })
+  const reviews = await Review.find({}).populate({
+    path: 'product',
+    select: 'name price company',
+  })
+
   res.status(StatusCodes.OK).json({ reviews })
 }
 const getSingleReview = async (req, res) => {
@@ -49,6 +48,8 @@ const updateReview = async (req, res) => {
   if (!review) {
     throw new CustomError.NotFoundError(`no review with this id ${id}`)
   }
+  console.log('req', req.user)
+  console.log('review', review.user.toString())
   checkPermissions(req.user, review.user)
   review.rating = rating
   review.title = title

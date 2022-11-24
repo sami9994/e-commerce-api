@@ -35,10 +35,12 @@ const updateProduct = async (req, res) => {
 }
 const deleteProduct = async (req, res) => {
   const { id } = req.params
-  const product = await Product.findOneAndDelete({ _id: id })
+  const product = await Product.findOne({ _id: id })
   if (!product) {
     throw new CustomError.NotFoundError(`no product founds with id : ${id}`)
   }
+  // its important because it will trigger Review model to delete the relative reviews for specific product
+  await product.remove()
   res
     .status(StatusCodes.OK)
     .json({ msg: `the product with id : ${id} has been deleted successfully` })
