@@ -6,6 +6,11 @@ const app = express()
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
 const fileUpload = require('express-fileupload')
+const rateLimiter = require('express-rate-limit')
+const helmet = require('helmet')
+const xss = require('xss-clean')
+const cors = require('cors')
+const mongoSanitize = require('express-mongo-sanitize')
 //database
 const connectDB = require('./db/connect.js')
 //middle ware
@@ -17,6 +22,16 @@ const productRouter = require('./routes/productRoutes')
 const reviewsRouter = require('./routes/reviewRoutes.js')
 const orderRouter = require('./routes/orderRoutes.js')
 
+app.use(
+  rateLimiter({
+    windowMs: 15 * 60 * 1000,
+    max: 60,
+  })
+)
+app.use(helmet())
+app.use(mongoSanitize())
+app.use(cors())
+app.use(xss())
 app.use(morgan('tiny')) // it used console the request method and the path and the response status
 app.use(express.json()) //to get data from page
 app.use(cookieParser(process.env.JWT_SECRET))

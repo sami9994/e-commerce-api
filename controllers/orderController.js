@@ -3,6 +3,7 @@ const Review = require('../models/Review')
 const Order = require('../models/Order')
 const { StatusCodes } = require('http-status-codes')
 const CustomError = require('../errors')
+const checkPermissions = require('../utils/checkPermission')
 
 const fakeStripeAPI = async ({ amount, currency }) => {
   const clientSecret = 'some values'
@@ -44,7 +45,7 @@ const createOrder = async (req, res) => {
     amount: total,
     currency: 'usd',
   })
-  console.log(req.user)
+
   const order = await Order.create({
     orderItems,
     total,
@@ -57,20 +58,39 @@ const createOrder = async (req, res) => {
   res.status(StatusCodes.OK).json({ order })
 }
 const getAllOrders = async (req, res) => {
-  res.send('create')
+  const orders = await Order.find({})
+  res.status(StatusCodes.OK).json({ orders, count: orders.length })
 }
 const getSingleOrder = async (req, res) => {
-  res.send('create')
+  const { id } = req.params
+  const order = await Order.findOne({ _id: id })
+  if (!order) {
+    throw new CustomError.NotFoundError(`no product with id ${item.product}`)
+  }
+  checkPermissions(req.user, order.user)
+  res.status(StatusCodes.OK).json({ order })
 }
-const getCurrentOrder = async (req, res) => {
-  res.send('create')
+const getCurrentOrders = async (req, res) => {
+  const orders = await Order.find({ user: req.user.userId.toString() })
+  res.status(StatusCodes.OK).json({ orders, count: orders.length })
 }
+
 const updateOrder = async (req, res) => {
-  res.send('create')
+  const { id } = req.params
+  const { paymentIntentId } = req.body
+  const order = await Order.findOne({ _id: id })
+  if (!order) {
+    throw new CustomError.NotFoundError(`no product with id ${item.product}`)
+  }
+  checkPermissions(req.user, order.user)
+  order.paymentIntentId = paymentIntentId
+  order.status = 'paid'
+  await order.save()
+  res.status(StatusCodes.OK).json({ order })
 }
 module.exports = {
   getAllOrders,
-  getCurrentOrder,
+  getCurrentOrders,
   getSingleOrder,
   updateOrder,
   createOrder,

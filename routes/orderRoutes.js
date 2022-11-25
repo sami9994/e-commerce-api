@@ -1,6 +1,6 @@
 const {
   getAllOrders,
-  getCurrentOrder,
+  getCurrentOrders,
   getSingleOrder,
   updateOrder,
   createOrder,
@@ -15,9 +15,9 @@ router
   .route('/')
   .post(authenticateUser, createOrder)
   .get(authenticateUser, authorizePermissions('admin'), getAllOrders)
+router.route('/showAllMyOrders').get(authenticateUser, getCurrentOrders)
 router
   .route('/:id')
   .get(authenticateUser, getSingleOrder)
   .patch(authenticateUser, updateOrder)
-router.route('/showAllMyOrders').get(authenticateUser, getCurrentOrder)
 module.exports = router
